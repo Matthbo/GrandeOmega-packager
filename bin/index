@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+
+const chalk = require("chalk"),
+    fsPromises = require("fs").promises,
+    Downloader = require("./downloader")
+
+function main() {
+    const dl = new Downloader(__dirname + "/../tmp")
+    
+    console.log(chalk.blueBright("Downloading Grande Omega"))
+
+    dl.downloadFile("http://www.grandeomega.com/downloads/go_student_mac.zip").then(() => {
+        console.log(chalk.blueBright("Unzipping Grande Omega"))
+        dl.unzipFile()
+
+        return cleanUp()
+    }).then(() => {
+        console.log(chalk.blueBright("Finished"))
+    }).catch(error => {
+        console.log(chalk.redBright(`Failed to package Grande Omega!\n${error.stack}`))
+        cleanUp()
+    })
+}
+
+async function cleanUp(){
+    try{
+        await fsPromises.unlink(__dirname + "/../tmp/go.zip")
+    } catch(error){
+        console.log(chalk.redBright(`Failed to clean up!\n${error.stack}`))
+    }
+}
+
+main()
