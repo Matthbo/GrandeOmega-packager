@@ -1,32 +1,42 @@
 #!/usr/bin/env node
 
 const chalk = require("chalk"),
-    fsPromises = require("fs").promises,
-    Downloader = require("./downloader")
+    fs = require("fs"),
+    fsPromises = fs.promises,
+    Downloader = require("./downloader"),
+    GO = require("./go")
 
-function main() {
-    const dl = new Downloader(__dirname + "/../tmp")
+async function main() {
+    try {
+        const dl = new Downloader(__dirname + "/../tmp", __dirname + "/../GO"),
+            go = new GO(__dirname + "/../GO")
+
+        const needsDownload = await go.checkVersion("http://grandeomega.com/api/v1/CustomAssignmentLogic/version")
+
+        if(needsDownload){    
+            await dl.downloadFile("http://www.grandeomega.com/downloads/go_student_mac.zip").then(() => {
+                console.log(chalk.blueBright("Unzipping Grande Omega"))
     
-    console.log(chalk.blueBright("Downloading Grande Omega"))
+                return fsPromises.rmdir(__dirname + "/../GO", { recursive: true })
+            }).then(() => dl.unzipFile())
 
-    dl.downloadFile("http://www.grandeomega.com/downloads/go_student_mac.zip").then(() => {
-        console.log(chalk.blueBright("Unzipping Grande Omega"))
-        dl.unzipFile()
+            await go.installDependencies()
+        }
 
-        return cleanUp()
-    }).then(() => {
-        console.log(chalk.blueBright("Finished"))
-    }).catch(error => {
-        console.log(chalk.redBright(`Failed to package Grande Omega!\n${error.stack}`))
-        cleanUp()
-    })
+        console.log(chalk.blueBright("Cleaning up"))
+
+        await cleanUp().then(() => console.log(chalk.blueBright("Finished")))
+    } catch(error){
+        console.error(chalk.redBright(`Failed to package Grande Omega!\n${error.stack}`))
+        await cleanUp()
+    }
 }
 
 async function cleanUp(){
     try{
-        await fsPromises.unlink(__dirname + "/../tmp/go.zip")
+        await fsPromises.unlink(__dirname + "/../tmp/go.zip").catch(error => { if(!error.code === "ENOENT") throw error })
     } catch(error){
-        console.log(chalk.redBright(`Failed to clean up!\n${error.stack}`))
+        console.error(chalk.redBright(`Failed to clean up!\n${error.stack}`))
     }
 }
 

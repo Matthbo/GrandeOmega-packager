@@ -7,12 +7,15 @@ const fetch = require("node-fetch"),
     utils = require("./utils")
 
 module.exports = class Downloader {
-    constructor(outDir) {
+    constructor(outDir, goDir) {
         this.outDir = outDir
+        this.goDir = path.normalize(goDir)
         this.filePath = path.normalize(outDir + "/go.zip")
     }
 
-    async downloadFile(url){
+    async downloadFile(url) {
+        console.log(chalk.blueBright("Downloading Grande Omega"))
+        
         await utils.TestIfDirExistAndCreateDir(this.outDir)
 
         const res = await fetch(url),
@@ -25,9 +28,17 @@ module.exports = class Downloader {
 
     unzipFile(){
         const file = admZip(this.filePath),
-            fileContents = file.getEntries().filter(content => !content.entryName.startsWith("go_student_mac/node_modules"))
+            fileContents = (file.getEntries().filter(
+                content => !(content.entryName.startsWith("go_student_mac/node_modules")
+                    || content.entryName.endsWith("/")
+                    || content.entryName.endsWith(".map"))
+            ))
 
-        fileContents.forEach(content => console.log(content.entryName))
+        fileContents.forEach(content => {
+            let extractDir = path.dirname(`${this.goDir}/${content.entryName.replace("go_student_mac/", "")}`)
+
+            file.extractEntryTo(content.entryName, extractDir, false, false)
+        })
 
         console.log(chalk.greenBright("  Done"))
     }
