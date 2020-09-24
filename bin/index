@@ -17,7 +17,7 @@ async function main() {
             await dl.downloadFile("http://www.grandeomega.com/downloads/go_student_mac.zip").then(() => {
                 console.log(chalk.blueBright("Unzipping Grande Omega"))
     
-                return fsPromises.rmdir(__dirname + "/../GO", { recursive: true })
+                return fsPromises.rmdir(__dirname + "/../GO", { recursive: true }).catch(error => { if (!error.code === "ENOENT") throw error })
             }).then(() => dl.unzipFile())
             await go.patch()
             await go.installDependencies()
