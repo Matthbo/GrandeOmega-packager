@@ -1,5 +1,10 @@
 GO/
 tmp/
+dist/
+
+# IDE config files
+.vscode/
+.idea/
 
 # Nodejs ignores:
 # Logs

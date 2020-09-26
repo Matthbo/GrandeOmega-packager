@@ -1,5 +1,6 @@
 {
   "name": "ts-bccc-meta-interpreter-playground",
+  "description": "Grande Omega, patched & build by Matthbo",
   "author": {
     "name": "Dr. Giuseppe Maggiore",
     "email": "giuseppemag@gmail.com"
@@ -20,7 +21,6 @@
     "devtools-protocol": "0.0.547074",
     "diff-match-patch": "1.0.0",
     "dotenv": "^5.0.1",
-    "electron": "^2.0.4",
     "electron-debug": "^2.0.0",
     "electron-main-window": "^1.0.4",
     "fs-extra": "5.0.0",
@@ -64,5 +64,8 @@
     "vscode-nls": "^3.2.2",
     "ws": "^3.3.2",
     "xml2js": "0.4.19"
+  },
+  "devDependencies": {
+    "electron": "4.2.12"
   }
 }

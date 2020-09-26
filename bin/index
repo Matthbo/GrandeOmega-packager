@@ -9,23 +9,28 @@ const chalk = require("chalk"),
 async function main() {
     try {
         const dl = new Downloader(__dirname + "/../tmp", __dirname + "/../GO"),
-            go = new GO(__dirname + "/../GO", __dirname + "/../patcher")
+            go = new GO(__dirname + "/../GO", __dirname + "/../patcher", __dirname + "/../dist")
 
         const needsDownload = await go.checkVersion("http://grandeomega.com/api/v1/CustomAssignmentLogic/version")
 
         if(needsDownload){    
-            await dl.downloadFile("http://www.grandeomega.com/downloads/go_student_mac.zip").then(() => {
-                console.log(chalk.blueBright("Unzipping Grande Omega"))
-    
-                return fsPromises.rmdir(__dirname + "/../GO", { recursive: true }).catch(error => { if (!error.code === "ENOENT") throw error })
-            }).then(() => dl.unzipFile())
+            await dl.downloadFile("http://www.grandeomega.com/downloads/go_student_mac.zip")
+
+            console.log(chalk.blueBright("Unzipping Grande Omega"))
+            await fsPromises.rmdir(__dirname + "/../GO", { recursive: true }).catch(
+                error => { if (!error.code === "ENOENT") throw error }
+            ).then(() => dl.unzipFile())
+
             await go.patch()
             await go.installDependencies()
         }
 
-        console.log(chalk.blueBright("Cleaning up"))
+        await go.build()
 
-        await cleanUp().then(() => console.log(chalk.blueBright("Finished")))
+        console.log(chalk.blueBright("Cleaning up"))
+        await cleanUp()
+
+        console.log(chalk.blueBright("Finished"))
     } catch(error){
         console.error(chalk.redBright(`Failed to package Grande Omega!\n${error.stack}`))
         await cleanUp()
