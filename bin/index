@@ -9,7 +9,7 @@ const chalk = require("chalk"),
 async function main() {
     try {
         const dl = new Downloader(__dirname + "/../tmp", __dirname + "/../GO"),
-            go = new GO(__dirname + "/../GO", __dirname + "/../patcher", __dirname + "/../dist")
+            go = new GO(__dirname + "/../GO", __dirname + "/../patcher", __dirname + "/../dist", __dirname + "/../resources")
 
         const needsDownload = await go.checkVersion("http://grandeomega.com/api/v1/CustomAssignmentLogic/version")
 

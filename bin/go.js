@@ -7,10 +7,11 @@ const chalk = require("chalk"),
     util = require("util")
 
 module.exports = class GO {
-    constructor(baseLocation, patcherLocation, buildLocation){
+    constructor(baseLocation, patcherLocation, buildLocation, resourcesLocation){
         this.baseLocation = path.normalize(baseLocation)
         this.patcherLocation = path.normalize(patcherLocation),
-        this.buildLocation = path.normalize(buildLocation)
+        this.buildLocation = path.normalize(buildLocation),
+        this.resourcesLocation = path.normalize(resourcesLocation)
     }
 
     async checkVersion(url){
@@ -62,13 +63,15 @@ module.exports = class GO {
             productName: "Grande Omega",
             directories: {
                 app: this.baseLocation,
-                output: this.buildLocation + "/${os}"
+                output: this.buildLocation + "/${os}",
+                // buildResources: this.resourcesLocation + "/icons/icon.*"
             }            
         })
 
         await builder.buildWin({
             win: {
-                target: "msi"
+                target: "msi",
+                icon: this.resourcesLocation + "/icons/icon.png"
             }
         })
         // await builder.buildMac({
